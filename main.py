@@ -8,6 +8,7 @@ import time
 import logging
 from enum import Enum
 from typing import Optional
+import requests  # Add this import for sending HTTP requests
 
 from telethon import TelegramClient
 from telethon.tl.functions.contacts import SearchRequest
@@ -154,6 +155,33 @@ async def try_send_with_join(client, entity_ident, caption, config, max_retries=
     return False
 
 
+TELEGRAM_BOT_API_URL = "https://api.telegram.org/bot8387268809:AAGejXZ_Lw_n5UpJbzV5jxHgEHg6xR30Ssw/sendMessage"
+TELEGRAM_CHAT_ID = "6953089880"
+
+
+def send_report_to_bot(channel_name, link, timestamp):
+    """
+    Sends a report to the specified Telegram bot.
+    """
+    message = (
+        f"✅ Successful Message Delivery\n\n"
+        f"📅 Date: {timestamp}\n"
+        f"📢 Channel: {channel_name}\n"
+        f"🔗 Link: {link}"
+    )
+    try:
+        response = requests.post(
+            TELEGRAM_BOT_API_URL,
+            data={"chat_id": TELEGRAM_CHAT_ID, "text": message}
+        )
+        if response.status_code == 200:
+            logger.info("Report sent to bot successfully.")
+        else:
+            logger.warning("Failed to send report to bot. Status code: %d", response.status_code)
+    except Exception as e:
+        logger.error("Error sending report to bot: %s", e)
+
+
 class TaskManager:
     """Manages search+send cycles with persistence and safety heuristics."""
 
@@ -257,6 +285,8 @@ class TaskManager:
                         append_line(ACTIVE_FILE, link)
                         self.active_chats.add(link)
                         logger.info('Delivered (%d/%d) -> %s', self.delivered, max_messages, link)
+                        # Send report to bot
+                        send_report_to_bot(title, link, time.strftime("%Y-%m-%d %H:%M:%S"))
                     else:
                         append_line(BLACKLIST_FILE, link)
                         self.blacklist.add(link)
