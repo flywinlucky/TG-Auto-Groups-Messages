@@ -1,0 +1,15 @@
+{
+  "per_combo_limit": 30,
+  "fetch_limit": 100,
+  "delivered_target": 5,
+  "per_chat_retries": 3,
+  "min_delay": 1.0,
+  "max_delay": 3.0,
+  "combo_delay_min": 2.0,
+  "combo_delay_max": 6.0,
+  "cycle_sleep_seconds": 3600,
+  "min_members": 0,
+  "flood_wait_multiplier": 1.0,
+  "flood_wait_default": 60,
+  "default_caption": ""
+}
